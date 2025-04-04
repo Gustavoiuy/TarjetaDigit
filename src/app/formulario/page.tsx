@@ -24,7 +24,7 @@ export default function Formulario() {
       // Ocultar la tarjeta después de 1 minuto
       const timer = setTimeout(() => {
         setCliente(null);
-      }, 60000); 
+      }, 900000); 
 
       return () => clearTimeout(timer);
     }

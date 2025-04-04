@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation'; // Para redirigir
+import { useRouter } from 'next/navigation'; 
 import Webcam from 'react-webcam';
 import jsQR from 'jsqr';
 
@@ -10,8 +10,14 @@ export default function EscanearTarjeta() {
   const [codigoEscaneado, setCodigoEscaneado] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const webcamRef = useRef<Webcam>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(document.createElement('canvas'));
-  const router = useRouter(); // Para redirigir a la vista de edición
+  const canvasRef = useRef<HTMLCanvasElement | null>(null); // ✅ Inicializar como null
+  const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && !canvasRef.current) {
+      canvasRef.current = document.createElement("canvas"); // ✅ Solo se ejecuta en el cliente
+    }
+  }, []);
 
   useEffect(() => {
     if (isScanning) {
@@ -27,7 +33,7 @@ export default function EscanearTarjeta() {
   };
 
   const scanQRCode = () => {
-    if (!webcamRef.current || !webcamRef.current.video) return;
+    if (!webcamRef.current || !webcamRef.current.video || !canvasRef.current) return;
 
     const video = webcamRef.current.video;
     if (video.videoWidth === 0 || video.videoHeight === 0) return;
@@ -50,24 +56,19 @@ export default function EscanearTarjeta() {
     if (code) {
       setCodigoEscaneado(code.data);
       setIsScanning(false);
-
-      // Simulación de una búsqueda en la base de datos
       buscarTarjetaAsociada(code.data);
     }
   };
 
   const buscarTarjetaAsociada = async (codigo: string) => {
     try {
-      // Simulación de una API donde se obtiene la tarjeta con el código QR
       const response = await fetch(`/api/tarjetas/${codigo}`);
       if (!response.ok) {
         throw new Error('Tarjeta no encontrada');
       }
 
       const tarjeta = await response.json();
-      
-      // Redirigir a la vista de edición con los datos de la tarjeta
-      router.push(`/editar-tarjeta/${tarjeta.id}`);
+      router.push(`../../admin/editar-tarjeta/${tarjeta.codigo}`);
     } catch (err) {
       setError("No se encontró la tarjeta asociada.");
     }

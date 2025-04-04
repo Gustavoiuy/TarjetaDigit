@@ -22,6 +22,6 @@ model Tarjeta {
   codigo      String @unique
   clienteId   String @unique
   cliente     Cliente @relation(fields: [clienteId], references: [id])
-  descuentos  String[] // Array de descuentos disponibles
+  descuento   String   @default("10")
   usada       Boolean @default(false)
 }

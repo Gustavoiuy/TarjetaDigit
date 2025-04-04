@@ -19,17 +19,28 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
+
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
   try {
-    const { descuentos } = await req.json();
+    const { descuento } = await req.json(); // Obtener el descuento del cuerpo de la solicitud
 
+    // Asegúrate de que el descuento no sea vacío
+    if (!descuento) {
+      console.log(descuento);
+      console.error("Descuento vacío");
+      return NextResponse.json({ error: "El descuento no puede estar vacío." }, { status: 400 });
+    }
+
+    // Actualizar la tarjeta con el descuento proporcionado
     const tarjetaActualizada = await prisma.tarjeta.update({
-      where: { id: params.id },
-      data: { descuentos },
+      where: { codigo: params.id }, // Asegúrate de que el 'id' es el correcto
+      data: { descuento }, // Actualizar el descuento
+      
     });
 
-    return NextResponse.json(tarjetaActualizada);
+    return NextResponse.json(tarjetaActualizada); // Devolver la tarjeta actualizada
   } catch (error) {
+    console.error(error);
     return NextResponse.json({ error: "Error al actualizar la tarjeta" }, { status: 500 });
   }
 }

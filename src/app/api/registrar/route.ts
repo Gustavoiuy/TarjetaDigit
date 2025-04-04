@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { nanoid } from "nanoid"; // Generador de ID único
+import { string } from "zod";
 
 const prisma = new PrismaClient();
 
@@ -19,11 +20,12 @@ export async function POST(req: Request) {
         tarjeta: {
           create: {
             codigo,
-            descuentos: ["5% de descuento", "10% de descuento", "15% de descuento"],
+            descuento: "10%"// Ajustado para cumplir con el tipo esperado
           },
         },
       },
     });
+    
 
     // Devolver el código generado al frontend
     return NextResponse.json({ codigo }, { status: 201 });
